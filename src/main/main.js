@@ -65,7 +65,11 @@ function registerProtocols() {
     let rel = decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
     const file = path.resolve(RENDERER, rel);
     if (!file.startsWith(path.resolve(RENDERER))) return new Response('Forbidden', { status: 403 });
-    try { return await serveFile(file, request); } catch { return new Response('Not found', { status: 404 }); }
+    // UI files live inside app.asar once packaged; read them whole (streams from asar can come back short).
+    try {
+      const body = await fsp.readFile(file);
+      return new Response(body, { status: 200, headers: { 'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' } });
+    } catch { return new Response('Not found', { status: 404 }); }
   });
   protocol.handle('media', async (request) => {
     try {

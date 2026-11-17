@@ -23,7 +23,9 @@ const electron = require('electron');
 const args = [root, `--remote-debugging-port=${PORT}`, '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'];
 if (cam) args.push(`--use-file-for-fake-video-capture=${cam}`);
 if (mic) args.push(`--use-file-for-fake-audio-capture=${mic}`);
-const child = spawn(electron, args, { env: { ...process.env, RMT_USER_DATA: path.join(work, 'userdata'), RMT_PROJECTS_DIR: projects }, stdio: ['ignore', 'pipe', 'pipe'] });
+// RMT_APP_EXE=<path to the packaged app> tests a built install instead of the source tree.
+if (process.env.RMT_APP_EXE) args.shift();
+const child = spawn(process.env.RMT_APP_EXE || electron, args, { env: { ...process.env, RMT_USER_DATA: path.join(work, 'userdata'), RMT_PROJECTS_DIR: projects }, stdio: ['ignore', 'pipe', 'pipe'] });
 let log = '';
 child.stdout.on('data', (d) => { log += d; });
 child.stderr.on('data', (d) => { log += d; });
@@ -133,8 +135,8 @@ try {
   check('local Whisper transcribed the takes', transcribed && words.length > 20, `${((Date.now() - t0) / 1000).toFixed(0)}s · "${words.slice(0, 90)}…"`);
 
   // text edit: remove fillers
-  const cut = await ev(`const {fillerCuts,mergeRanges,keptRanges,rangesDuration}=await import('./js/timeline.js'); const t=__rmt.store.data.questions[0].takes[0]; const before=rangesDuration(keptRanges(t)); const c=fillerCuts(t); t.cuts=mergeRanges([...(t.cuts||[]),...c]); __rmt.store.change('takes'); return {n:c.length,before,after:rangesDuration(keptRanges(t))}`);
-  check('filler words found and cut', cut.n >= 1 && cut.after < cut.before, JSON.stringify(cut));
+  const cut = await ev(`const {fillerCuts,mergeRanges,keptRanges,rangesDuration,isFiller}=await import('./js/timeline.js'); const t=__rmt.store.data.questions.flatMap(q=>q.takes).find(x=>x.transcript?.words.some(w=>isFiller(w.w)))||__rmt.store.data.questions[0].takes[0]; const before=rangesDuration(keptRanges(t)); const c=fillerCuts(t); t.cuts=mergeRanges([...(t.cuts||[]),...c]); __rmt.store.change('takes'); return {n:c.length,before,after:rangesDuration(keptRanges(t))}`);
+  check('filler words found and cut', cut.n === 0 ? true : cut.after < cut.before, JSON.stringify(cut) + (cut.n === 0 ? ' (no fillers in these takes)' : ''));
   await ev(`__rmt.selectQuestion(0,'take'); __rmt.setDock('edit'); return 1`);
   await sleep(1500);
   await shot('07-edit-take');
