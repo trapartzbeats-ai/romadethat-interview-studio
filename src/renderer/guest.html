@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' app:; style-src 'self' 'unsafe-inline' app:; font-src 'self' app:; script-src 'self' app:">
+<title>Guest screen</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  html, body { background: #000; cursor: none; }
+  .g { position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr auto; padding: 4vh 6vw; }
+  .g-top { display: flex; justify-content: space-between; font: 600 1.6vh var(--mono); letter-spacing: .4vh; color: #777; }
+  .g-top .rec { color: #ff3b3b; display: none; border: 0; background: none; padding: 0; font-size: 1.6vh; }
+  .g.recording .g-top .rec { display: flex; }
+  .gstage { position: relative; overflow: hidden; }
+  .ask { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 3vh; }
+  .ask small { font: 600 2vh var(--mono); letter-spacing: .6vh; color: var(--acc); }
+  .ask p { margin: 0; font: 7.4vh/1.04 var(--head); text-transform: uppercase; color: #fff; max-width: 90%; }
+  .ask .listen { font: 600 2vh var(--mono); color: #999; letter-spacing: .3vh; display: flex; align-items: center; gap: 1.2vh; }
+  .ask .listen i { width: 1.2vh; height: 1.2vh; border-radius: 50%; background: var(--acc); animation: blink 1s infinite; }
+  .count { position: absolute; inset: 0; display: grid; place-items: center; font: 50vh/1 var(--head); color: #fff; }
+  .count.go { color: var(--acc); font-size: 26vh; letter-spacing: 2vh; }
+  .prom { position: absolute; inset: 0; overflow: hidden; }
+  .prom .p-text { left: 0; right: 0; font-weight: 650; line-height: 1.45; }
+  .prom .guide { position: absolute; left: -2vw; right: -2vw; top: 30%; height: 1.5em; border-top: 2px solid rgba(200,255,46,.35); border-bottom: 2px solid rgba(200,255,46,.35); }
+  .prom::after { content: ''; position: absolute; inset: 0; background: linear-gradient(#000 0, transparent 20%, transparent 70%, #000); pointer-events: none; }
+  .idle { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 2vh; }
+  .idle h1 { font: 9vh/1 var(--head); text-transform: uppercase; margin: 0; }
+  .idle p { color: #888; font-size: 2.4vh; margin: 0; }
+  .g-bottom { display: flex; align-items: center; gap: 2vw; font: 700 2.2vh var(--mono); color: #888; }
+  .tbar { flex: 1; height: .8vh; background: #1d1d22; border-radius: 1vh; overflow: hidden; }
+  .tbar i { display: block; height: 100%; width: 0; background: var(--acc); transition: width .2s linear; }
+  .g-bottom.near .tbar i { background: var(--warn); } .g-bottom.over .tbar i { background: var(--rec); }
+  .g-bottom.over { color: #fff; }
+  .mirror .gstage { transform: scaleX(-1); }
+</style>
+</head>
+<body>
+<div class="g" id="g">
+  <div class="g-top"><span id="gStep">INTERVIEW</span><span class="rec"><i></i>&nbsp;REC</span></div>
+  <div class="gstage">
+    <div class="idle" id="vIdle"><h1 id="gTitle">Get comfortable.</h1><p>Look at the camera. The question will appear here.</p></div>
+    <div class="ask" id="vAsk" hidden><small id="gNum">QUESTION 1</small><p id="gQ"></p><span class="listen" id="gListen"><i></i>LISTEN</span></div>
+    <div class="count" id="vCount" hidden></div>
+    <div class="prom" id="vProm" hidden><div class="guide"></div><div class="p-text" id="gText"></div></div>
+  </div>
+  <div class="g-bottom" id="gBottom"><span id="gTime">0:00</span><div class="tbar"><i id="gBar"></i></div><span id="gTarget"></span></div>
+</div>
+<script type="module" src="js/guest.js"></script>
+</body>
+</html>

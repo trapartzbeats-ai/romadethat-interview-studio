@@ -1,0 +1,112 @@
+{
+  "name": "romadethat-interview-studio",
+  "productName": "RoMadeThat Interview Studio",
+  "version": "2.0.0",
+  "description": "Interview studio: pre-recorded question voice, per-question takes, text-based editing, local captions and finished exports.",
+  "author": "RoMadeThat",
+  "main": "src/main/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "selftest": "node scripts/selftest.mjs",
+    "dist:win": "electron-builder --win --x64",
+    "dist:mac": "electron-builder --mac --arm64",
+    "icons": "node scripts/make-icons.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.3.2",
+    "ffmpeg-static": "^5.3.0"
+  },
+  "devDependencies": {
+    "electron": "^45.3.4",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "com.romadethat.interviewstudio",
+    "productName": "RoMadeThat Interview Studio",
+    "artifactName": "RoMadeThat-Interview-Studio-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "!**/*.map",
+      "!node_modules/onnxruntime-web/**",
+      "!node_modules/onnxruntime-node/bin/napi-v*/linux/**",
+      "!node_modules/@huggingface/transformers/dist/*.web*",
+      "!node_modules/@huggingface/transformers/types/**"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**",
+      "node_modules/onnxruntime-node/**",
+      "node_modules/sharp/**",
+      "node_modules/@img/**",
+      "**/*.node"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "files": [
+        "!node_modules/onnxruntime-node/bin/napi-v*/darwin/**",
+        "!node_modules/onnxruntime-node/bin/napi-v*/win32/arm64/**"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "RoMadeThat Interview Studio"
+    },
+    "portable": {
+      "artifactName": "RoMadeThat-Interview-Studio-${version}-portable.exe"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.video",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "files": [
+        "!node_modules/onnxruntime-node/bin/napi-v*/win32/**"
+      ],
+      "extendInfo": {
+        "NSCameraUsageDescription": "RoMadeThat Interview Studio records the interview from your camera.",
+        "NSMicrophoneUsageDescription": "RoMadeThat Interview Studio records your questions and the answers from your microphone."
+      }
+    },
+    "dmg": {
+      "title": "RoMadeThat Interview Studio"
+    },
+    "npmRebuild": false
+  }
+}

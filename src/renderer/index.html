@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' app: media:; img-src 'self' app: media: data: blob:; media-src 'self' app: media: blob:; style-src 'self' 'unsafe-inline' app:; font-src 'self' app:; script-src 'self' app:; connect-src 'self' app: media:">
+<title>RoMadeThat Interview Studio</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ START ============ -->
+<section id="start" class="start">
+  <div class="start-hero">
+    <div class="start-mark"><span>RMT</span><i></i></div>
+    <p class="kicker">ROMADETHAT · INTERVIEW STUDIO 2</p>
+    <h1>Ask it once.<br><em>Get the answer right.</em></h1>
+    <p class="lede">Pre-record your questions in your own voice, play them to your guest, record every answer as its own take, then cut the ums out by deleting words. Exports a finished, captioned interview in landscape, vertical and square.</p>
+    <div class="start-actions">
+      <button class="btn primary big" id="newBtn">New interview</button>
+      <button class="btn big" id="openBtn">Open project…</button>
+    </div>
+    <div class="start-recent" id="recentList"></div>
+  </div>
+  <div class="start-side">
+    <div class="flow">
+      <div class="flow-step"><b>01</b><span>Write the questions</span><small>Script answers word for word, or keep talking points.</small></div>
+      <div class="flow-step"><b>02</b><span>Record your voice asking them</span><small>Your guest hears you ask — the edit gets your voice too.</small></div>
+      <div class="flow-step"><b>03</b><span>Record answer takes</span><small>Card → countdown → answer. Retake any question alone.</small></div>
+      <div class="flow-step"><b>04</b><span>Edit by text</span><small>Click words to cut them. One click removes every “um”.</small></div>
+      <div class="flow-step"><b>05</b><span>Export everything</span><small>MP4 + captions, chapters, transcript and a clip per question.</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STUDIO ============ -->
+<div id="studio" class="studio" hidden>
+  <header class="top">
+    <div class="brand" title="RoMadeThat Interview Studio"><span class="mark">RMT</span><span class="brand-txt">INTERVIEW<br>STUDIO</span></div>
+    <div class="title-wrap"><input id="projTitle" class="proj-title" spellcheck="false" aria-label="Interview title"><span class="proj-dir" id="projDir"></span></div>
+    <div class="seg" id="aspectSeg" role="group" aria-label="Frame">
+      <button data-aspect="16:9" title="Landscape (YouTube)"><i class="ar ar169"></i>16:9</button>
+      <button data-aspect="9:16" title="Vertical (Reels, TikTok, Shorts)"><i class="ar ar916"></i>9:16</button>
+      <button data-aspect="1:1" title="Square"><i class="ar ar11"></i>1:1</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="ready-pill" id="readyPill"><span class="dots" id="readyDots"></span><span id="readyText">Ready check</span></button>
+    <div class="runtime"><small>PROGRAM</small><b id="runtime">0:00</b></div>
+    <button class="btn ghost" id="playProgramBtn" title="Preview the whole edit">▶ Preview</button>
+    <button class="btn ghost" id="guestBtn" title="Open a second window for your guest: question, countdown, prompter">Guest screen</button>
+    <button class="btn primary" id="exportBtn">Export</button>
+  </header>
+
+  <nav class="rail" id="rail">
+    <button data-panel="questions" class="on"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h13"/></svg><span>Questions</span></button>
+    <button data-panel="voice"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Voice</span></button>
+    <button data-panel="devices"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg><span>Devices</span></button>
+    <button data-panel="look"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 20V9"/></svg><span>Look</span></button>
+    <button data-panel="captions"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 10.5a2 2 0 1 0 0 3M17 10.5a2 2 0 1 0 0 3"/></svg><span>Captions</span></button>
+    <button data-panel="music"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span>Music</span></button>
+    <div class="rail-fill"></div>
+    <button data-action="home" title="Back to projects"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7M5 10v10h14V10"/></svg><span>Projects</span></button>
+    <button data-action="help" title="Shortcuts and tips"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6M12 17h.01"/></svg><span>Help</span></button>
+  </nav>
+
+  <aside class="panel" id="panel">
+    <!-- QUESTIONS -->
+    <section data-panel="questions" class="on">
+      <div class="p-head"><h2>Questions</h2><div class="p-tools"><button class="mini" id="importScriptBtn" title="Import questions (.json, .txt)">Import</button><button class="mini" id="exportScriptBtn" title="Export questions">Export</button></div></div>
+      <ol class="q-list" id="qList"></ol>
+      <button class="add-row" id="addQBtn">+ Add question</button>
+      <div class="q-edit" id="qEdit">
+        <label class="lbl">Short title <small>(chapter name)</small></label>
+        <input id="qTitle" class="inp">
+        <label class="lbl">Question <small>(shown on the card)</small></label>
+        <textarea id="qText" class="inp" rows="3"></textarea>
+        <div class="row2">
+          <div><label class="lbl">Prompter shows</label>
+            <div class="seg small" id="qMode"><button data-mode="script">Script</button><button data-mode="points">Talking points</button></div></div>
+          <div><label class="lbl">Target length</label>
+            <select id="qTarget" class="inp"><option value="0">No target</option><option value="20">0:20</option><option value="30">0:30</option><option value="45">0:45</option><option value="60">1:00</option><option value="90">1:30</option><option value="120">2:00</option><option value="180">3:00</option></select></div>
+        </div>
+        <label class="lbl" id="qBodyLbl">Answer script</label>
+        <textarea id="qBody" class="inp body" rows="9"></textarea>
+        <label class="chk"><input type="checkbox" id="qInclude"> Include in the export</label>
+      </div>
+    </section>
+
+    <!-- VOICE -->
+    <section data-panel="voice">
+      <div class="p-head"><h2>Question voice</h2></div>
+      <p class="hint">Record yourself asking each question. It plays to your guest before every answer and goes into the final edit, cleaned and level-matched.</p>
+      <label class="lbl">Interviewer microphone</label>
+      <select id="voiceMicSel" class="inp"></select>
+      <button class="btn primary wide" id="voiceBatchBtn">● Record all questions</button>
+      <p class="hint small">Batch mode shows each question big. <kbd>Space</kbd> start / next · <kbd>R</kbd> redo · <kbd>Esc</kbd> done.</p>
+      <ol class="v-list" id="vList"></ol>
+    </section>
+
+    <!-- DEVICES -->
+    <section data-panel="devices">
+      <div class="p-head"><h2>Devices</h2></div>
+      <button class="btn primary wide" id="connectBtn">Connect camera + mic</button>
+      <label class="lbl">Camera</label><select id="camSel" class="inp"></select>
+      <label class="lbl">Answer microphone</label><select id="micSel" class="inp"></select>
+      <label class="lbl">Camera resolution</label>
+      <select id="qualitySel" class="inp"><option value="720">720p</option><option value="1080">1080p (recommended)</option><option value="2160">4K if available</option></select>
+      <label class="chk"><input type="checkbox" id="nsChk"> Live noise suppression</label>
+      <label class="chk"><input type="checkbox" id="agcChk"> Auto gain (off = steadier sound)</label>
+      <div class="p-sub">Ready check</div>
+      <ul class="ready" id="readyList"></ul>
+      <div class="p-sub">Recording flow</div>
+      <label class="lbl">Countdown before each answer</label>
+      <select id="countSel" class="inp"><option value="0">None</option><option value="3">3 seconds</option><option value="5">5 seconds</option></select>
+      <label class="lbl">Card time when a question has no voice</label>
+      <select id="cardSecSel" class="inp"><option value="3">3 s</option><option value="4">4 s</option><option value="5">5 s</option><option value="6">6 s</option><option value="8">8 s</option></select>
+      <label class="chk"><input type="checkbox" id="playVoiceChk"> Play my recorded question to the guest</label>
+      <label class="chk"><input type="checkbox" id="runAllChk"> Run-through: go straight to the next question</label>
+      <label class="chk"><input type="checkbox" id="autoScrollChk"> Scroll the prompter while recording</label>
+      <label class="chk"><input type="checkbox" id="voicePaceChk"> Prompter only moves while the guest talks</label>
+      <label class="chk"><input type="checkbox" id="guidesChk"> Framing guides on the monitor</label>
+      <label class="chk"><input type="checkbox" id="mirrorPrevChk"> Mirror the monitor (preview only)</label>
+    </section>
+
+    <!-- LOOK -->
+    <section data-panel="look">
+      <div class="p-head"><h2>Look</h2></div>
+      <label class="lbl">Card + frame style</label>
+      <div class="style-grid" id="styleGrid"></div>
+      <label class="lbl">Accent colour</label>
+      <div class="swatches" id="swatches"></div>
+      <label class="lbl">Layout</label>
+      <div class="seg" id="layoutSeg"><button data-layout="full">Full frame</button><button data-layout="framed">Framed</button></div>
+      <div class="row2"><div><label class="lbl">Framing left ↔ right</label><input type="range" id="cropX" min="0" max="1" step="0.01"></div><div><label class="lbl">Framing up ↕ down</label><input type="range" id="cropY" min="0" max="1" step="0.01"></div></div>
+      <label class="chk"><input type="checkbox" id="mirrorOutChk"> Mirror the camera in the export</label>
+      <div class="p-sub">Guest</div>
+      <div class="row2"><div><label class="lbl">Name</label><input id="guestName" class="inp"></div><div><label class="lbl">Role / title</label><input id="guestRole" class="inp"></div></div>
+      <label class="chk"><input type="checkbox" id="ltChk"> Name lower-third on the first answer</label>
+      <label class="chk"><input type="checkbox" id="ltEveryChk"> …on every answer</label>
+      <div class="p-sub">Logo</div>
+      <label class="chk"><input type="checkbox" id="bugChk"> Corner logo</label>
+      <div class="inline"><button class="mini" id="logoBtn">Choose logo…</button><button class="mini" id="logoClear">Use RMT mark</button></div>
+      <div class="p-sub">Intro + outro</div>
+      <label class="chk"><input type="checkbox" id="introChk"> Intro card</label>
+      <div class="row2"><div><label class="lbl">Intro title</label><input id="introTitle" class="inp"></div><div><label class="lbl">Kicker</label><input id="introKicker" class="inp"></div></div>
+      <label class="chk"><input type="checkbox" id="outroChk"> Outro card</label>
+      <div class="row2"><div><label class="lbl">Outro title</label><input id="outroTitle" class="inp"></div><div><label class="lbl">Sign-off line</label><input id="outroLine" class="inp"></div></div>
+    </section>
+
+    <!-- CAPTIONS -->
+    <section data-panel="captions">
+      <div class="p-head"><h2>Captions</h2></div>
+      <p class="hint">Transcribed on this computer with Whisper — nothing is uploaded. The first run downloads the speech model once.</p>
+      <label class="chk"><input type="checkbox" id="capAutoChk"> Transcribe each take when it's recorded</label>
+      <label class="chk"><input type="checkbox" id="capBurnChk"> Burn captions into the video</label>
+      <label class="lbl">Caption style</label>
+      <div class="seg" id="capStyleSeg"><button data-cap="bold">Bold pop</button><button data-cap="clean">Clean box</button><button data-cap="minimal">Minimal</button></div>
+      <label class="lbl">Speech model</label>
+      <select id="modelSel" class="inp"><option value="Xenova/whisper-base.en">English · fast (base)</option><option value="Xenova/whisper-small.en">English · most accurate (small)</option><option value="onnx-community/whisper-base_timestamped">Any language · fast</option></select>
+      <button class="btn wide" id="transcribeAllBtn">Transcribe all selected takes</button>
+      <div class="job" id="capJob"></div>
+      <p class="hint small">Fix a misheard word: double-click it in the Edit tab under the monitor.</p>
+    </section>
+
+    <!-- MUSIC -->
+    <section data-panel="music">
+      <div class="p-head"><h2>Music bed</h2></div>
+      <p class="hint">Plays under the cards and dips under the answers. Use music you own or have a licence for.</p>
+      <div class="music-file" id="musicFile">No music</div>
+      <div class="inline"><button class="mini" id="musicBtn">Choose track…</button><button class="mini" id="musicClear">Remove</button><button class="mini" id="musicPlay">Play</button></div>
+      <label class="lbl">Level under cards <output id="mCardsOut"></output></label><input type="range" id="mCards" min="0" max="1" step="0.01">
+      <label class="lbl">Level under answers <output id="mAnsOut"></output></label><input type="range" id="mAns" min="0" max="0.4" step="0.01">
+      <div class="p-sub">Voice polish</div>
+      <label class="chk"><input type="checkbox" id="normChk"> Level-match every voice (-16 LUFS)</label>
+      <label class="chk"><input type="checkbox" id="denoiseChk"> Extra noise reduction in the export</label>
+    </section>
+  </aside>
+
+  <main class="stage">
+    <div class="strip" id="strip"></div>
+    <div class="monitor-wrap" id="monitorWrap">
+      <div class="monitor" id="monitor">
+        <canvas id="screen" width="1280" height="720"></canvas>
+        <div class="hud tl"><span class="tag" id="modeTag">LIVE</span><span class="tag ghost" id="qTag"></span></div>
+        <div class="hud tr"><span class="rec" id="recTag" hidden><i></i>REC <b id="recTime">0:00</b></span><span class="target" id="targetTag" hidden></span></div>
+        <div class="hud br"><div class="meter"><span>MIC</span><div class="mtrack"><i id="meterBar"></i><b id="meterPeak"></b></div></div></div>
+        <div class="count" id="countBig" hidden></div>
+        <div class="empty" id="monitorEmpty"><p>Camera is off</p><button class="btn primary" id="connectBtn2">Connect camera + mic</button></div>
+        <div class="batch" id="batch" hidden>
+          <div class="batch-top"><span id="batchStep">QUESTION 1 / 8</span><span id="batchState">READY</span></div>
+          <p class="batch-q" id="batchQ"></p>
+          <div class="batch-wave"><i id="batchMeter"></i></div>
+          <div class="batch-keys"><kbd>Space</kbd> record / next · <kbd>R</kbd> redo · <kbd>P</kbd> play back · <kbd>Esc</kbd> done</div>
+        </div>
+      </div>
+    </div>
+    <div class="transport" id="transport">
+      <div class="t-left"><span class="t-q" id="tQ"></span></div>
+      <div class="t-mid" id="tMid"></div>
+      <div class="t-right" id="tRight"></div>
+    </div>
+    <section class="dock" id="dock">
+      <div class="dock-tabs" id="dockTabs">
+        <button data-dock="prompter" class="on">Prompter</button>
+        <button data-dock="edit">Edit take</button>
+        <button data-dock="takes">Takes <b id="takeCount"></b></button>
+        <div class="dock-tools" id="dockTools"></div>
+      </div>
+      <div class="dock-body">
+        <div data-dock="prompter" class="on prompter-pane">
+          <div class="prompter" id="prompter"><div class="p-guide"></div><div class="p-text" id="pText"></div></div>
+        </div>
+        <div data-dock="edit" class="edit-pane">
+          <div class="wave" id="waveWrap"><canvas id="wave"></canvas></div>
+          <div class="words" id="words"></div>
+        </div>
+        <div data-dock="takes" class="takes-pane"><div class="takes" id="takes"></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ DIALOGS ============ -->
+<dialog id="newDlg" class="dlg">
+  <form method="dialog" id="newForm">
+    <p class="kicker">NEW INTERVIEW</p>
+    <h2>Who's in the chair?</h2>
+    <label class="lbl">Interview title</label><input class="inp" id="nTitle" required placeholder="RoMadeThat — Origin Story">
+    <div class="row2"><div><label class="lbl">Guest name</label><input class="inp" id="nGuest" placeholder="Ro"></div><div><label class="lbl">Role</label><input class="inp" id="nRole" placeholder="Creator · RoMadeThat"></div></div>
+    <label class="chk"><input type="checkbox" id="nSample" checked> Start with the 8 RoMadeThat questions + scripts</label>
+    <p class="hint small">Saved to Documents/RoMadeThat Interviews. Each project is a folder you can move or back up.</p>
+    <div class="dlg-actions"><button class="btn" value="cancel" formnovalidate>Cancel</button><button class="btn primary" value="ok">Create</button></div>
+  </form>
+</dialog>
+
+<dialog id="exportDlg" class="dlg wide">
+  <div class="dlg-head"><div><p class="kicker">EXPORT</p><h2>Finish the interview</h2></div><button class="x" id="exportClose">✕</button></div>
+  <div class="exp-grid">
+    <div>
+      <div class="p-sub">Formats</div>
+      <label class="chk"><input type="checkbox" data-fmt="16:9" checked> Landscape 16:9 · 1920×1080</label>
+      <label class="chk"><input type="checkbox" data-fmt="9:16"> Vertical 9:16 · 1080×1920</label>
+      <label class="chk"><input type="checkbox" data-fmt="1:1"> Square 1:1 · 1080×1080</label>
+      <div class="p-sub">Extras</div>
+      <label class="chk"><input type="checkbox" id="xClips" checked> A separate clip for every question</label>
+      <label class="chk"><input type="checkbox" id="xBurn"> Burn captions in</label>
+      <label class="chk"><input type="checkbox" id="xDocs" checked> Captions (.srt), YouTube chapters, transcript</label>
+      <label class="chk"><input type="checkbox" id="xMusic"> Music bed</label>
+    </div>
+    <div>
+      <div class="p-sub">Program</div>
+      <ul class="exp-list" id="expList"></ul>
+    </div>
+  </div>
+  <div class="exp-progress" id="expProgress" hidden><div class="bar"><i id="expBar"></i></div><p id="expLabel"></p></div>
+  <div class="exp-done" id="expDone" hidden></div>
+  <div class="dlg-actions"><button class="btn" id="expCancel">Close</button><button class="btn primary" id="expGo">Export</button></div>
+</dialog>
+
+<dialog id="helpDlg" class="dlg">
+  <div class="dlg-head"><div><p class="kicker">SHORTCUTS</p><h2>Run the room</h2></div><button class="x" id="helpClose">✕</button></div>
+  <table class="keys">
+    <tr><td><kbd>Space</kbd></td><td>Record the selected question · skip the card · finish the answer</td></tr>
+    <tr><td><kbd>R</kbd></td><td>Retake — keep this take and ask again</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>Stop recording</td></tr>
+    <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Previous / next question</td></tr>
+    <tr><td><kbd>P</kbd></td><td>Play the question voice</td></tr>
+    <tr><td><kbd>G</kbd></td><td>Framing guides</td></tr>
+    <tr><td><kbd>Del</kbd></td><td>Cut the selected words (Edit tab)</td></tr>
+  </table>
+  <p class="hint">Tips: use headphones for the guest if the speakers are near the mic · put the guest screen on a monitor right under the camera lens so their eyes stay on the lens · record a 30 second test take first.</p>
+</dialog>
+
+<div id="toasts" class="toasts"></div>
+<video id="camVideo" muted playsinline hidden></video>
+<video id="takeVideo" playsinline hidden crossorigin="anonymous"></video>
+<audio id="voiceAudio" hidden></audio>
+<audio id="musicAudio" hidden loop></audio>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
